@@ -13,12 +13,13 @@
 # (1+2)*3 => 9
 #
 # передаваемое для расчета выражение считаем синтаксически верным
-# проверку не производим
+# проверку не производим. Расчет
 
 import os
 
 # список операций по убыванию приоритета (важно!)
-OPERATIONS = ('*', '/', '+', '-')
+# - олобрабатывать раньше +. ()
+OPERATIONS = ('*', '/', '-', '+')
 
 # парсинг строки в список
 def parse_str(strk: str, list_op: tuple) -> list:
@@ -27,7 +28,7 @@ def parse_str(strk: str, list_op: tuple) -> list:
     start_pos = 0
     i = 0
     while i < len(strk):
-        if strk[i] == '(':  # нашли скобку -> ищем парную закрывающую
+        if strk[i] == '(':  # нашли скобку -> ищем пару
             brackets_cnt += 1
             j = i + 1
             while brackets_cnt > 0:
@@ -36,9 +37,8 @@ def parse_str(strk: str, list_op: tuple) -> list:
                 elif strk[j] == '(':
                     brackets_cnt += 1
                 j += 1
-            i = j
-
-        if strk[i] in list_op:  # нашли оператор
+            i = j-1
+        elif strk[i] in list_op:  # нашли оператор
             result.append(strk[start_pos:i])
             result.append(strk[i])
             start_pos = i+1
@@ -50,15 +50,16 @@ def parse_str(strk: str, list_op: tuple) -> list:
 # вычисление выражения
 # evals - список аргументов и операций
 # oper - набор выполлняемых операций по убыванию приоритета
-
-
 def calc_val(evals: list, oper: list):
     # один аргумент - расчет окончен
     if len(evals) == 1:
         return float(evals[0])
 
     # операция от начала списка (идут по убыванию приоритета)
-    index_op = evals.index(oper[0])
+    try:
+        index_op = evals.index(oper[0])
+    except:
+        index_op = -1
 
     # искомой операции нет
     if index_op < 0:
@@ -68,30 +69,24 @@ def calc_val(evals: list, oper: list):
     # проводим вычисление
     # проверяем скобку на аргументах операции
     param = []
-    for c in [evals[index_op-1], evals[index_op+1]]:
+    for c in (evals[index_op-1], evals[index_op+1]):
         if c[0] == '(':
-            param.append(calc_val(parse_str(c[1:-1], OPERATIONS), list(OPERATIONS)))
+            str_par = calc_val(parse_str(c[1:-1], OPERATIONS), list(OPERATIONS))
+            param.append(float(str_par))
         else:
             param.append(float(c))
     
     # вычисление
     evals[index_op] = calc(param, oper[0])
-    
-#
-#    if evals[index_op-1][0] == '(':
-#        arg_1 = calc_val(parse_str(evals[index_op-1][1:-1], OPERATIONS), list(OPERATIONS))
-#    else:
-#        arg_1 = float(evals[index_op-1])
-#
-#    if evals[index_op+1][0] == '(':
-#        arg_2 = calc_val(parse_str(evals[index_op+1][1:-1], OPERATIONS), list(OPERATIONS))
-#    else:
-#        arg_2 = float(evals[index_op+1])
-#
+    # удалить элементы справа& слева
+    evals.pop(index_op+1)
+    evals.pop(index_op-1)
+
+    return calc_val(evals, oper)
 
 
 # блок операций
-def calc(par: list, op: str) -> float:
+def calc(par: list, op: str) -> str:
     res = 0.
     match op:
         case '*':
@@ -102,17 +97,20 @@ def calc(par: list, op: str) -> float:
             res = par[0]+par[1]
         case '-':
             res = par[0]-par[1]
-    return res
-
+    return str(res)
 
 
 ## MAIN ##
-line_str = '2+(4-7)*3'
+os.system('cls')
 
-i = 1
-j = 4
-#tt = line_str[i:j]
+tasks = ((
+    '2+(4-7)*3', 
+    '4*(3-1)/(9-7)', 
+    '8+2*4+(6+(2-3)*2)', 
+    '12-8+3*2' 
+    ))
 
-# print(int(tt))
-
-print(parse_str(line_str, OPERATIONS))
+for t in tasks:
+    lst = parse_str(t, OPERATIONS)
+    print(lst)
+    print(f'{t} = {calc_val(lst, list(OPERATIONS))}')
