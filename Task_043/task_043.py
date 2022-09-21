@@ -6,9 +6,6 @@
 #
 import os
 
-def get_cnt(item: int, lst: list):
-    return lst.count(item)
-
 # формирование списка уникальных элементов из посл.
 def unic_list(data: list) -> list: 
     dct = {x : data.count(x) for x in data}
