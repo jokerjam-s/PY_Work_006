@@ -80,4 +80,8 @@ Sample Output:
 
 Локомотив: 2 2 0 0 6
 
+Скриншот 
+
+!['Скрин 3'](/ScreenShots/task_foot.png 'Screen 3')
+
 ---

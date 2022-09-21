@@ -20,5 +20,7 @@ tests = ((
     [1, 1, 3, 5, 4, 3, 3, 10]
 ))
 
+print('Задача 43')
+print('---------')
 for t in tests:
     print(f'{t} -> {unic_list(t)}')

@@ -117,6 +117,8 @@ tasks = ((
     '-3-1'
     ))
 
+print('Задача 41')
+print('---------')
 for t in tasks:
     lst = parse_str(t)
     print(f'{t} = {calc_val(lst)}')
